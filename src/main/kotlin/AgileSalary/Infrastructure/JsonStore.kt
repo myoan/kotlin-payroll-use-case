@@ -1,6 +1,6 @@
 package AgileSalary.Infrastructure
 
-import AgileSalary.Model.HourlyEmployee
+import AgileSalary.Model.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.io.File
@@ -9,6 +9,8 @@ import java.io.File
 class JsonStore : DataStore {
     var filepath: String = ""
     var hourlyEmployees: MutableList<HourlyEmployee>
+    var salaryEmployees: MutableList<SalaryEmployee>
+    var commissionEmployees: MutableList<CommissionEmployee>
 
     companion object {
         fun load(filepath: String): JsonStore {
@@ -19,8 +21,10 @@ class JsonStore : DataStore {
         }
     }
 
-    constructor(filepath: String) {
+    constructor() {
         hourlyEmployees = mutableListOf()
+        salaryEmployees = mutableListOf()
+        commissionEmployees = mutableListOf()
     }
 
     override fun add(emp: HourlyEmployee) {
@@ -28,8 +32,20 @@ class JsonStore : DataStore {
         flush()
     }
 
+    override fun add(emp: SalaryEmployee) {
+        salaryEmployees.add(emp)
+        flush()
+    }
+
+    override fun add(emp: CommissionEmployee) {
+        commissionEmployees.add(emp)
+        flush()
+    }
+
     override fun delete(id: Int) {
         hourlyEmployees = hourlyEmployees.filter { it.id != id }.toMutableList()
+        salaryEmployees = salaryEmployees.filter { it.id != id }.toMutableList()
+        commissionEmployees = commissionEmployees.filter { it.id != id }.toMutableList()
     }
 
     fun show() {

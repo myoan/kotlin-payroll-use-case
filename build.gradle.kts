@@ -8,6 +8,10 @@ plugins {
 
 group = "me.user"
 version = "1.0-SNAPSHOT"
+val koin_version: String by extra("3.0.1")
+val kodein_version: String by extra("7.5.0")
+val kotest_version: String by extra("4.5.0")
+val mockk_version: String by extra("1.11.0")
 
 repositories {
     mavenCentral()
@@ -17,13 +21,15 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    implementation("org.kodein.di:kodein-di:7.5.0")
-    // Koin for JUnit 5
-    testImplementation("io.insert-koin:koin-test-junit5:3.0.1")
-    // Koin Extended & experimental features (JVM)
-    implementation("io.insert-koin:koin-core:3.0.1")
-    implementation("io.insert-koin:koin-core-ext:3.0.1")
+    implementation("org.kodein.di:kodein-di:$kodein_version")
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
+    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-core-ext:$koin_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotest_version")
+    testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
+    testImplementation("io.kotest:kotest-property:$kotest_version")
+    testImplementation("io.mockk:mockk:$mockk_version")
 }
 
 tasks.test {
@@ -32,6 +38,10 @@ tasks.test {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.withType<Test>() {
+    useJUnitPlatform()
 }
 
 application {

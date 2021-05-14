@@ -1,7 +1,9 @@
 package AgileSalary.Command
 
 import AgileSalary.Infrastructure.DataStore
-import AgileSalary.Model.HourlyEmployee
+import AgileSalary.Model.*
+import java.lang.Exception
+import java.lang.IllegalArgumentException
 
 class AddEmp(val db: DataStore, val args: List<String>): Command {
     val empID: Int
@@ -21,6 +23,9 @@ class AddEmp(val db: DataStore, val args: List<String>): Command {
     fun createEmployee() {
         when(type) {
             "H" -> db.add(HourlyEmployee(empID, name, address, data))
+            "S" -> db.add(SalaryEmployee(empID, name, address, data))
+            "C" -> db.add(CommissionEmployee(empID, name, address, data))
+            else -> throw IllegalArgumentException("Undefined Type: '$type'")
         }
     }
 }
