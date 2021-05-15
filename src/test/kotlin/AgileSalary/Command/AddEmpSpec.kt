@@ -21,6 +21,7 @@ class AddEmpSpec: DescribeSpec({
                cmd.exec()
                db.hourlyEmployees.size shouldBe 1
                db.salaryEmployees.size shouldBe 0
+               db.commissionEmployees.size shouldBe 0
            }
         }
 
@@ -31,6 +32,7 @@ class AddEmpSpec: DescribeSpec({
                 cmd.exec()
                 db.hourlyEmployees.size shouldBe 0
                 db.salaryEmployees.size shouldBe 1
+                db.commissionEmployees.size shouldBe 0
             }
         }
 
@@ -63,6 +65,19 @@ class AddEmpSpec: DescribeSpec({
             it ("throw exception") {
                 shouldThrow<Exception> {
                     val cmd2 = AddEmp(db, listOf("1", "fuga", "address", "H", "hoge"))
+                    cmd2.exec()
+                }
+            }
+        }
+
+        describe ("when duplicate entry in different employee type") {
+            beforeTest {
+                val cmd = AddEmp(db, listOf("1", "hoge", "address", "H", "hoge"))
+                cmd.exec()
+            }
+            it ("throw exception") {
+                shouldThrow<Exception> {
+                    val cmd2 = AddEmp(db, listOf("1", "fuga", "address", "S", "hoge"))
                     cmd2.exec()
                 }
             }
