@@ -48,6 +48,18 @@ class JsonStore : DataStore {
         commissionEmployees = commissionEmployees.filter { it.id != id }.toMutableList()
     }
 
+    override fun findByEmployeeID(id: Int): Employee? {
+        val hEmp = hourlyEmployees.find { it.id == id }
+        if (hEmp != null) return hEmp
+
+        val sEmp = salaryEmployees.find { it.id == id }
+        if (sEmp != null) return sEmp
+
+        val cEmp = commissionEmployees.find { it.id == id }
+        if (cEmp != null) return cEmp
+        return null
+    }
+
     fun show() {
         val format = Json { prettyPrint = true }
         println(format.encodeToString(this))

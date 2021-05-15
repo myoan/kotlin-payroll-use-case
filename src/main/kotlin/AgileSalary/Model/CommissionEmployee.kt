@@ -1,6 +1,8 @@
 package AgileSalary.Model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 @Serializable
-data class CommissionEmployee(val id: Int, val name: String, val address: String, val data: List<String>) {}
+class CommissionEmployee: Employee {
+    constructor(id: Int, name: String, address: String, data: List<String>) : super(id, name, address, data) {}
+}

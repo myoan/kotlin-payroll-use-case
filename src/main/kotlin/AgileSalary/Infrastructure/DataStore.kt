@@ -7,4 +7,5 @@ interface DataStore {
     fun add(emp: SalaryEmployee)
     fun add(emp: CommissionEmployee)
     fun delete(id: Int)
+    fun findByEmployeeID(id: Int): Employee?
 }

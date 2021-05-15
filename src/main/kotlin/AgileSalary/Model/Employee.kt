@@ -1,7 +1,10 @@
 package AgileSalary.Model
 
+import kotlinx.serialization.Serializable
 
-interface Employee<T> {
-    fun create(id: Int, name: String, address: String, data: List<String>): T
-    fun delete(id: Int)
-}
+@Serializable
+open class Employee(val id: Int,
+               val name: String,
+               val address: String,
+               val data: List<String>
+) {}

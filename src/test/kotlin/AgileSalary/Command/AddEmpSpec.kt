@@ -54,5 +54,18 @@ class AddEmpSpec: DescribeSpec({
                 }
             }
         }
+
+        describe ("when duplicate entry in same employee type") {
+            beforeTest {
+                val cmd = AddEmp(db, listOf("1", "hoge", "address", "H", "hoge"))
+                cmd.exec()
+            }
+            it ("throw exception") {
+                shouldThrow<Exception> {
+                    val cmd2 = AddEmp(db, listOf("1", "fuga", "address", "H", "hoge"))
+                    cmd2.exec()
+                }
+            }
+        }
     }
 })
