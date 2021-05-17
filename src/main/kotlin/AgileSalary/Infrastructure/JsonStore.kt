@@ -11,6 +11,8 @@ class JsonStore : DataStore {
     var hourlyEmployees: MutableList<HourlyEmployee>
     var salaryEmployees: MutableList<SalaryEmployee>
     var commissionEmployees: MutableList<CommissionEmployee>
+    override val employeesNum: Int
+        get() = listOf(hourlyEmployees, salaryEmployees, commissionEmployees).sumOf { it.size }
 
     companion object {
         fun load(filepath: String): JsonStore {

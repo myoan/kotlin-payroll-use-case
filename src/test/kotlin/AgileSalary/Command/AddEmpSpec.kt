@@ -1,8 +1,6 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.DataStore
 import AgileSalary.Infrastructure.MemoryDataStore
-import AgileSalary.Model.*
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.*

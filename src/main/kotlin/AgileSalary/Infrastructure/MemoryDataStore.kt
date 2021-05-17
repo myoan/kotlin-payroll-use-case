@@ -9,6 +9,8 @@ class MemoryDataStore: DataStore {
     var hourlyEmployees: MutableList<HourlyEmployee>
     var salaryEmployees: MutableList<SalaryEmployee>
     var commissionEmployees: MutableList<CommissionEmployee>
+    override val employeesNum: Int
+        get() = listOf(hourlyEmployees, salaryEmployees, commissionEmployees).sumOf { it.size }
 
     init {
         hourlyEmployees = mutableListOf()
@@ -27,7 +29,11 @@ class MemoryDataStore: DataStore {
         commissionEmployees.add(emp)
     }
 
-    override fun delete(id: Int) {}
+    override fun delete(id: Int) {
+        hourlyEmployees = hourlyEmployees.filter { it.id != id }.toMutableList()
+        salaryEmployees = salaryEmployees.filter { it.id != id }.toMutableList()
+        commissionEmployees = commissionEmployees.filter { it.id != id }.toMutableList()
+    }
 
     override fun findByEmployeeID(id: Int): Employee? {
         val hEmp = hourlyEmployees.find { it.id == id }

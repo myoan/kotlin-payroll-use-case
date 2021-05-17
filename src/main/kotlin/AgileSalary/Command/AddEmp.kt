@@ -2,7 +2,6 @@ package AgileSalary.Command
 
 import AgileSalary.Infrastructure.DataStore
 import AgileSalary.Model.*
-import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 class AddEmp(val db: DataStore, val args: List<String>): Command {
