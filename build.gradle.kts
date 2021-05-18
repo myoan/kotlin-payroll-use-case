@@ -8,6 +8,7 @@ plugins {
 
 group = "me.user"
 version = "1.0-SNAPSHOT"
+val exposed_version: String by extra("0.31.1")
 val koin_version: String by extra("3.0.1")
 val kodein_version: String by extra("7.5.0")
 val kotest_version: String by extra("4.5.0")
@@ -18,14 +19,20 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    implementation("mysql:mysql-connector-java:8.0.23")
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.kodein.di:kodein-di:$kodein_version")
-    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
     implementation("io.insert-koin:koin-core:$koin_version")
     implementation("io.insert-koin:koin-core-ext:$koin_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+
+    testImplementation(kotlin("test-junit5"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
     testImplementation("io.kotest:kotest-runner-junit5:$kotest_version")
     testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
     testImplementation("io.kotest:kotest-property:$kotest_version")
@@ -42,8 +49,4 @@ tasks.withType<KotlinCompile>() {
 
 tasks.withType<Test>() {
     useJUnitPlatform()
-}
-
-application {
-    mainClassName = "MainKt"
 }

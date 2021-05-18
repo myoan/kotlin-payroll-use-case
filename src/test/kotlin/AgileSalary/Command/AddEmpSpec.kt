@@ -1,82 +1,76 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.MemoryDataStore
+import AgileSalary.Infrastructure.EmployeeRepository
+import AgileSalary.Model.Employee
+import AgileSalary.Model.EmployeeType
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.*
-import java.lang.IllegalArgumentException
+import io.mockk.*
+
+object repo : EmployeeRepository {
+    override fun create(
+        _id: Int,
+        _name: String,
+        _address: String,
+        _data: List<String>,
+        _type: EmployeeType
+    ) {}
+
+    override fun findByID(id: Int): Employee? = null
+    override fun deleteByID(id: Int) {}
+}
 
 class AddEmpSpec: DescribeSpec({
-    val db = MemoryDataStore()
-    describe ("exec") {
-        beforeTest {
-            db.clear()
-        }
-        describe ("when type is Hourly employee") {
-           val args = listOf("1", "name", "address", "H", "hoge")
-           val cmd = AddEmp(db, args)
-           it ("add Hourly employee") {
-               cmd.exec()
-               db.hourlyEmployees.size shouldBe 1
-               db.salaryEmployees.size shouldBe 0
-               db.commissionEmployees.size shouldBe 0
-           }
-        }
+    beforeTest {
+        mockkObject(repo)
+    }
 
-        describe ("when type is Salary employee") {
-            val args = listOf("1", "name", "address", "S", "hoge")
-            val cmd = AddEmp(db, args)
-            it ("add salary employee") {
-                cmd.exec()
-                db.hourlyEmployees.size shouldBe 0
-                db.salaryEmployees.size shouldBe 1
-                db.commissionEmployees.size shouldBe 0
+    describe ("exec") {
+        describe ("when type is Hourly employee") {
+            justRun { repo.create(any(), any(), any(), any(), EmployeeType.HOURLY) }
+            it ("add Hourly employee") {
+                AddEmp(repo, listOf("1", "name", "address", "H", "hoge")).exec()
+                verify(exactly = 1) { repo.create(any(), any(), any(), any(), EmployeeType.HOURLY) }
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.SALARY) }
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.COMMISSION) }
             }
         }
 
-        describe ("when type is Comission employee") {
-            val args = listOf("1", "name", "address", "C", "hoge", "fuga")
-            val cmd = AddEmp(db, args)
-            it ("add commission employee") {
-                cmd.exec()
-                db.hourlyEmployees.size shouldBe 0
-                db.salaryEmployees.size shouldBe 0
-                db.commissionEmployees.size shouldBe 1
+        describe ("when type is Salary employee") {
+            justRun { repo.create(any(), any(), any(), any(), EmployeeType.SALARY) }
+            it ("add salary employee") {
+                AddEmp(repo, listOf("1", "name", "address", "S", "hoge")).exec()
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.HOURLY) }
+                verify(exactly = 1) { repo.create(any(), any(), any(), any(), EmployeeType.SALARY) }
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.COMMISSION) }
+            }
+        }
+
+        describe ("when type is Commission employee") {
+            justRun { repo.create(any(), any(), any(), any(), EmployeeType.COMMISSION) }
+            it ("add salary employee") {
+                AddEmp(repo, listOf("1", "name", "address", "C", "hoge")).exec()
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.HOURLY) }
+                verify(exactly = 0) { repo.create(any(), any(), any(), any(), EmployeeType.SALARY) }
+                verify(exactly = 1) { repo.create(any(), any(), any(), any(), EmployeeType.COMMISSION) }
             }
         }
 
         describe ("when type is invalid") {
-            val args = listOf("1", "name", "address", "X", "hoge")
-            val cmd = AddEmp(db, args)
             it ("throw exception") {
                 shouldThrow<IllegalArgumentException> {
-                    cmd.exec()
+                    AddEmp(repo, listOf("1", "name", "address", "X", "hoge")).exec()
                 }
             }
         }
 
-        describe ("when duplicate entry in same employee type") {
-            beforeTest {
-                val cmd = AddEmp(db, listOf("1", "hoge", "address", "H", "hoge"))
-                cmd.exec()
-            }
+        describe ("when duplicate entry") {
             it ("throw exception") {
-                shouldThrow<Exception> {
-                    val cmd2 = AddEmp(db, listOf("1", "fuga", "address", "H", "hoge"))
-                    cmd2.exec()
+                every { repo.findByID(any()) } returns mockk {
+                    every { name } returns "hoge"
                 }
-            }
-        }
-
-        describe ("when duplicate entry in different employee type") {
-            beforeTest {
-                val cmd = AddEmp(db, listOf("1", "hoge", "address", "H", "hoge"))
-                cmd.exec()
-            }
-            it ("throw exception") {
                 shouldThrow<Exception> {
-                    val cmd2 = AddEmp(db, listOf("1", "fuga", "address", "S", "hoge"))
-                    cmd2.exec()
+                    AddEmp(repo, listOf("1", "fuga", "address", "H", "hoge")).exec()
                 }
             }
         }

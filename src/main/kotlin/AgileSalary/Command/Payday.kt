@@ -2,7 +2,7 @@ package AgileSalary.Command
 
 import AgileSalary.Infrastructure.DataStore
 
-class Payday(val db: DataStore, val args: List<String>): Command {
+class Payday(val args: List<String>): Command {
     override fun exec() = println("exec")
     override fun validate() = println("validate")
 }

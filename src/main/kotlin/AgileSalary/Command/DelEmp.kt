@@ -1,9 +1,9 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.DataStore
+import AgileSalary.Infrastructure.EmployeeRepository
 import java.lang.IllegalArgumentException
 
-class DelEmp(val db: DataStore, val args: List<String>): Command {
+class DelEmp(val repo: EmployeeRepository, val args: List<String>): Command {
     val empID: Int
         get() = args[0].toInt()
 
@@ -11,9 +11,9 @@ class DelEmp(val db: DataStore, val args: List<String>): Command {
         if (!isExists()) {
             throw IllegalArgumentException("NotFound: id ($empID)")
         }
-        db.delete(empID)
+        repo.deleteByID(empID)
     }
     override fun validate() = println("validate")
 
-    fun isExists(): Boolean = db.findByEmployeeID(empID) != null
+    fun isExists(): Boolean = repo.findByID(empID) != null
 }
