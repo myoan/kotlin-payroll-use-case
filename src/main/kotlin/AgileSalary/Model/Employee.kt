@@ -5,6 +5,8 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDateTime
 
 enum class EmployeeType(val index: Int) {
     HOURLY(0),
@@ -28,4 +30,18 @@ class Employee(id: EntityID<Int>) : IntEntity(id) {
     var data1 by Employees.data1
     var data2 by Employees.data2
     var type by Employees.type
+
+    // val timecards by TimeCard referrersOn TimeCards.employee
+
+    fun getOrCreateTimeCardByDate(_date: LocalDateTime): TimeCard {
+        val emp = this
+        return transaction {
+            val records = TimeCard.find { TimeCards.date eq _date }
+            records.firstOrNull() ?: TimeCard.new {
+                empID = emp.id.value
+                date = _date
+                workingTime = 0
+            }
+        }
+    }
 }

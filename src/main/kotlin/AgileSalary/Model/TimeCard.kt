@@ -1,34 +1,25 @@
 package AgileSalary.Model
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.`java-time`.datetime
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-@Serializer(forClass = LocalDateTime::class)
-class LocalDateTimeSerializer: KSerializer<LocalDateTime> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("LocalDatetime", PrimitiveKind.STRING)
-
-    override fun serialize(output: Encoder, value: LocalDateTime) {
-        output.encodeString(value.format(DateTimeFormatter.ISO_LOCAL_DATE))
-    }
-
-    override fun deserialize(input: Decoder): LocalDateTime {
-        return LocalDateTime.parse(input.decodeString())
-    }
+object TimeCards : IntIdTable("time_cards") {
+    val empID: Column<Int> = integer("employee_id")
+    val date: Column<LocalDateTime> = datetime("date")
+    val workingTime: Column<Int> = integer("working_time")
+    // val employee = reference("employee", Employees)
 }
 
-@Serializable
-data class TimeCard(
-    val id: Int,
-    @Serializable(with = LocalDateTimeSerializer::class)
-    val date: LocalDateTime,
-    val workingTime: Int) {
+class TimeCard(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<TimeCard>(TimeCards)
+
+    var empID by TimeCards.empID
+    var date by TimeCards.date
+    var workingTime by TimeCards.workingTime
+    // var employee by Employee referencedOn TimeCards.employee
 }
