@@ -1,19 +1,20 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.EmployeeRepository
+import AgileSalary.Model.Employee
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.lang.IllegalArgumentException
 
-class DelEmp(val repo: EmployeeRepository, val args: List<String>): Command {
+class DelEmp(val args: List<String>): Command {
     val empID: Int
         get() = args[0].toInt()
 
     override fun exec() {
-        if (!isExists()) {
-            throw IllegalArgumentException("NotFound: id ($empID)")
+        transaction {
+            val emp = Employee.findById(empID)
+            emp ?: throw IllegalArgumentException("NotFound: id ($empID)")
+
+            emp.delete()
         }
-        repo.deleteByID(empID)
     }
     override fun validate() = println("validate")
-
-    fun isExists(): Boolean = repo.findByID(empID) != null
 }

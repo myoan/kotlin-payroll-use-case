@@ -8,22 +8,20 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.`java-time`.datetime
 import java.time.LocalDateTime
 
-object TimeCards : IntIdTable("time_cards") {
+object SalesReceipts : IntIdTable("sales_receipts") {
     val empID: Column<Int> = integer("employee_id")
     val date: Column<LocalDateTime> = datetime("date")
-    val workingTime: Column<Int> = integer("working_time")
+    val amount: Column<Int> = integer("amount")
     val createdAt: Column<LocalDateTime> = datetime("created_at")
     val updatedAt: Column<LocalDateTime> = datetime("updated_at")
-    // val employee = reference("employee", Employees)
 }
 
-class TimeCard(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<TimeCard>(TimeCards)
+class SalesReceipt(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<SalesReceipt>(SalesReceipts)
 
-    var empID by TimeCards.empID
-    var date by TimeCards.date
-    var workingTime by TimeCards.workingTime
-    var createdAt by TimeCards.createdAt
-    var updatedAt by TimeCards.updatedAt
-    // var employee by Employee referencedOn TimeCards.employee
+    var empID by SalesReceipts.empID
+    var date by SalesReceipts.date
+    var amount by SalesReceipts.amount
+    var createdAt by SalesReceipts.createdAt
+    var updatedAt by SalesReceipts.updatedAt
 }

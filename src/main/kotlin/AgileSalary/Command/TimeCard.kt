@@ -1,15 +1,20 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.EmployeeRepository
-import AgileSalary.Infrastructure.TimeCardRepository
+import AgileSalary.Model.Employee
 import AgileSalary.Model.EmployeeType
+import AgileSalary.Model.TimeCard
+import AgileSalary.Model.TimeCards
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class TimeCard(val empRepo: EmployeeRepository, val tcRepo: TimeCardRepository, val args: List<String>): Command {
+class TimeCard(val args: List<String>): Command {
     val empID: Int
         get() = args[0].toInt()
     val date: LocalDateTime
@@ -25,9 +30,12 @@ class TimeCard(val empRepo: EmployeeRepository, val tcRepo: TimeCardRepository, 
     override fun validate() = println("validate")
 
     fun insertTimeCard() {
-        println("exec $empID $date $workingTime")
+        val args = this
+        val emp = transaction {
+            addLogger(StdOutSqlLogger)
+            Employee.findById(empID)
+        }
 
-        val emp = empRepo.findByID(empID)
         if (emp == null) {
             throw IllegalArgumentException("employee not found: '$empID'")
         }
@@ -35,8 +43,18 @@ class TimeCard(val empRepo: EmployeeRepository, val tcRepo: TimeCardRepository, 
             throw IllegalArgumentException("employee is not hourly: '$empID'")
         }
 
-        val tc = emp.getOrCreateTimeCardByDate(date)
         transaction {
+            addLogger(StdOutSqlLogger)
+            val query = TimeCards.slice(TimeCards.columns)
+                .select { (TimeCards.empID eq empID) and (TimeCards.date eq date) }
+            val tc = TimeCard.wrapRows(query).firstOrNull() ?: TimeCard.new {
+                empID = args.empID
+                date = args.date
+                workingTime = 0
+                createdAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now()
+            }
+
             tc.workingTime = workingTime
         }
     }

@@ -13,6 +13,7 @@ val koin_version: String by extra("3.0.1")
 val kodein_version: String by extra("7.5.0")
 val kotest_version: String by extra("4.5.0")
 val mockk_version: String by extra("1.11.0")
+val h2_version: String by extra("1.4.200")
 
 repositories {
     mavenCentral()
@@ -38,6 +39,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
     testImplementation("io.kotest:kotest-property:$kotest_version")
     testImplementation("io.mockk:mockk:$mockk_version")
+    testImplementation("com.h2database:h2:$h2_version")
 }
 
 tasks.test {

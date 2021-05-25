@@ -1,10 +1,13 @@
 package AgileSalary.Command
 
-import AgileSalary.Infrastructure.EmployeeRepository
 import AgileSalary.Model.*
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
 
-class AddEmp(val repo: EmployeeRepository, val args: List<String>): Command {
+class AddEmp(val args: List<String>): Command {
     val empID: Int
         get() = args[0].toInt()
     val name: String
@@ -28,11 +31,28 @@ class AddEmp(val repo: EmployeeRepository, val args: List<String>): Command {
             "C" -> EmployeeType.COMMISSION
             else -> throw IllegalArgumentException("Undefined Type: '$type'")
         }
-        repo.create(empID, name, address, data, typeEnum)
+        val cmd = this
+        transaction {
+            addLogger(StdOutSqlLogger)
+            Employee.new(cmd.empID) {
+                name = cmd.name
+                address = cmd.address
+                data1 = cmd.data.getOrElse(0, { "" })
+                data2 = cmd.data.getOrElse(1, { "" })
+                receiveMethod = ReceiveMethod.MAIL.index
+                type = typeEnum.index
+                lastPayday = LocalDateTime.now()
+                createdAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now()
+            }
+        }
+
     }
 
     fun validateDuplicateID() {
-        val emp = repo.findByID(empID)
+        val emp = transaction {
+            Employee.findById(empID)
+        }
 
         if (emp != null) {
             throw IllegalArgumentException("duplicate id: '$empID'")

@@ -1,6 +1,6 @@
 import AgileSalary.Command.*
+import AgileSalary.Command.SalesReceipt
 import AgileSalary.Command.TimeCard
-import AgileSalary.Infrastructure.*
 import AgileSalary.Model.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -19,16 +19,13 @@ fun parseCommand(args: List<String>): Command {
     val cmd = args.getOrElse(0) { "help" }
     val opt = args.drop(1)
     return when(cmd) {
-        "AddEmp" -> AddEmp(EmployeeRepositoryImpl, opt)
+        "AddEmp" -> AddEmp(opt)
         "ChgEmp" -> ChgEmp(opt)
-        "DelEmp" -> DelEmp(EmployeeRepositoryImpl, opt)
+        "DelEmp" -> DelEmp(opt)
         "PayDay" -> Payday(opt)
         "SalesReceipt" -> SalesReceipt(opt)
         "ServiceCharge" -> ServiceCharge(opt)
-        "TimeCard" -> TimeCard(
-            EmployeeRepositoryImpl,
-            TimeCardRepositoryImpl,
-            opt)
+        "TimeCard" -> TimeCard(opt)
         else -> Help(opt)
     }
 }
