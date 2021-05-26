@@ -4,10 +4,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.`java-time`.datetime
-import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.lang.IllegalArgumentException
 import java.time.DayOfWeek
@@ -68,5 +66,13 @@ class Employee(id: EntityID<Int>) : IntEntity(id) {
             else -> false
         }
     }
-    fun isUnion(): Boolean = false
+
+    fun isUnion(): Boolean {
+        val mid = id.value
+        val union = transaction {
+            UnionServiceCharges.slice(UnionServiceCharges.columns)
+                .select { UnionServiceCharges.empID eq mid }.firstOrNull()
+        }
+        return union != null
+    }
 }
