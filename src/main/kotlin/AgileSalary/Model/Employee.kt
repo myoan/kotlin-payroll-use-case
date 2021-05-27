@@ -75,4 +75,19 @@ class Employee(id: EntityID<Int>) : IntEntity(id) {
         }
         return union != null
     }
+
+    fun unionFee(date: LocalDateTime): Int {
+        val mid = id.value
+        val union = transaction {
+            UnionServiceCharges.slice(UnionServiceCharges.columns)
+                .select { UnionServiceCharges.empID eq mid }.firstOrNull()
+        }
+        if (union == null) {
+            return 0
+        }
+
+        val paymentWeeks = Math.abs(ChronoUnit.WEEKS.between(date, lastPayday)).toInt() + 1
+        println("payment: $paymentWeeks")
+        return union.get(UnionServiceCharges.amount) * paymentWeeks
+    }
 }

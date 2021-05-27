@@ -149,4 +149,55 @@ class EmployeeSpec: DescribeSpec({
             it("returns true") { employee.isUnion() shouldBe true }
         }
     }
+
+    describe("unionFee") {
+        val employee = transaction {
+            Employee.new {
+                name = "name"
+                address = "address"
+                data1 = ""
+                data2 = ""
+                receiveMethod = ReceiveMethod.MAIL.index
+                type = EmployeeType.HOURLY.index
+                lastPayday = LocalDateTime.now()
+                createdAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now()
+            }
+        }
+        context("employee not in union") {
+            val date = LocalDateTime.now()
+            it("returns 0") { employee.unionFee(date) shouldBe 0 }
+        }
+
+        context("employee in union") {
+            beforeTest {
+                transaction {
+                    UnionServiceCharge.new {
+                        empID = employee.id.value
+                        amount = 10
+                        createdAt = LocalDateTime.now()
+                        updatedAt = LocalDateTime.now()
+                    }
+                }
+            }
+            val date = LocalDateTime.now()
+            it ("returns 10") { employee.unionFee(date) shouldBe 10}
+        }
+
+        context("employee not pay union fee 2 week") {
+            val date = LocalDateTime.now()
+            beforeTest {
+                transaction {
+                    employee.lastPayday = date.minusDays(13)
+                    UnionServiceCharge.new {
+                        empID = employee.id.value
+                        amount = 10
+                        createdAt = date
+                        updatedAt = date
+                    }
+                }
+            }
+            it ("returns 20") { employee.unionFee(date) shouldBe 20}
+        }
+    }
 })

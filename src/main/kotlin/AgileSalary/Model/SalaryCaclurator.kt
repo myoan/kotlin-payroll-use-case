@@ -32,7 +32,6 @@ object SalaryCaclurator {
         if (employee.isUnion()) {
             salary -= UnionServiceCharge.FEE * 4
         }
-
         return salary
     }
 }
